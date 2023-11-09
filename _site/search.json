@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Breast Cancer Prediction & Analysis",
+    "section": "",
+    "text": "Probability Theory and Random Variables\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nNov 1, 2023\n\n\nRithvik Guntor\n\n\n\n\n\n\n  \n\n\n\n\nClustering\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nNov 1, 2023\n\n\nRithvik Guntor\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Clustering",
+    "section": "",
+    "text": "# Read in the dataset using Pandas\ndata = pd.read_csv('breast-cancer.csv')\ndata.head()\n\n\n\n\n\n\n\n\nid\ndiagnosis\nradius_mean\ntexture_mean\nperimeter_mean\narea_mean\nsmoothness_mean\ncompactness_mean\nconcavity_mean\nconcave points_mean\n...\nradius_worst\ntexture_worst\nperimeter_worst\narea_worst\nsmoothness_worst\ncompactness_worst\nconcavity_worst\nconcave points_worst\nsymmetry_worst\nfractal_dimension_worst\n\n\n\n\n0\n842302\nM\n17.99\n10.38\n122.80\n1001.0\n0.11840\n0.27760\n0.3001\n0.14710\n...\n25.38\n17.33\n184.60\n2019.0\n0.1622\n0.6656\n0.7119\n0.2654\n0.4601\n0.11890\n\n\n1\n842517\nM\n20.57\n17.77\n132.90\n1326.0\n0.08474\n0.07864\n0.0869\n0.07017\n...\n24.99\n23.41\n158.80\n1956.0\n0.1238\n0.1866\n0.2416\n0.1860\n0.2750\n0.08902\n\n\n2\n84300903\nM\n19.69\n21.25\n130.00\n1203.0\n0.10960\n0.15990\n0.1974\n0.12790\n...\n23.57\n25.53\n152.50\n1709.0\n0.1444\n0.4245\n0.4504\n0.2430\n0.3613\n0.08758\n\n\n3\n84348301\nM\n11.42\n20.38\n77.58\n386.1\n0.14250\n0.28390\n0.2414\n0.10520\n...\n14.91\n26.50\n98.87\n567.7\n0.2098\n0.8663\n0.6869\n0.2575\n0.6638\n0.17300\n\n\n4\n84358402\nM\n20.29\n14.34\n135.10\n1297.0\n0.10030\n0.13280\n0.1980\n0.10430\n...\n22.54\n16.67\n152.20\n1575.0\n0.1374\n0.2050\n0.4000\n0.1625\n0.2364\n0.07678\n\n\n\n\n5 rows × 32 columns"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Probability Theory and Random Variables",
+    "section": "",
+    "text": "Blog Post Code & Analysis"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  }
+]

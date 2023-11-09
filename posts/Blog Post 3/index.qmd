@@ -1,0 +1,134 @@
+---
+title: "Linear and Nonlinear Regression"
+author: "Rithvik Guntor"
+date: "2023-11-1"
+categories: 
+  - code
+  - analysis
+jupyter:
+  jupytext:
+    formats: 'ipynb,qmd'
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.15.2
+  kernelspec: 
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+**Lasso Regression**
+
+Regression analysis is a powerful statistical technique that plays a vital role in numerous fields, including healthcare. In the context of breast cancer research, regression can be used to visualize and analyze relationships between numeric variables in different studies. Lasso regression is a specific type of regression in which there is a penalizer in the linear regression form to help prevent overfitting. This method allows for better interpretability and more accurate predictions with regression methods. The code below performs Lasso regression using a breast cancer dataset with several variables. The code studies potential relationships between the age of a patient and the tumor size.
+```{python}
+# Import necessary libraries
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+from sklearn.linear_model import Lasso
+from sklearn.ensemble import RandomForestRegressor
+```
+
+```{python}
+# Load the dataset
+data = pd.read_csv('gbsg.csv')
+data.head()
+```
+
+```{python}
+# Define your feature matrix (X) and target variable (y)
+X = data[['age']]
+y = data['size']
+```
+We want to split our data into training and testing data for model building/testing purposes.
+```{python}
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=4)
+```
+
+```{python}
+# Create a Lasso Regression model
+model = Lasso(alpha=1.0)
+```
+
+```{python}
+# Fit the Lasso model
+model.fit(X_train, y_train)
+```
+
+```{python}
+# Make predictions for the 'age' values
+y_pred = model.predict(X_test)
+y_pred
+```
+After making predictions using the test data, we want to verify the accuracy by computing the mean squared error and r-squared value.
+```{python}
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+```
+
+```{python}
+print("Mean Squared Error: ", mse)
+print("R-squared: ", r2)
+```
+
+```{python}
+# Create a scatter plot
+plt.scatter(X_test, y_test, color='blue', label='Actual', s=10)
+plt.plot(X_test, y_pred, color='red', label='Predicted', linewidth=2)
+plt.xlabel('Age')
+plt.ylabel('Tumor Size')
+plt.title('Age vs. Tumor Size (Lasso Regression)')
+plt.legend()
+plt.show()
+```
+Based on the output of our model and graph, it can be seen that there is a slightly negative relationship between the age of a patient and tumor size. This is indicated by r-squared value as well. Since we have an r-squared value of about -0.003, this means that not only is there a slightly negative relationship between age and tumor, but also a very weak/poor fit for the data, which can also be seen in the plot.
+
+**Random Forest Regression**
+
+From our previous Lasso regression model, the results were not as accurate as we were hoping for. However, we can try another type of regression model. This time, we will experiment with a nonlinear regression model known as RandomForest regression. It is a method to predict continuous values using a group of decision trees. Our linear approach using Lasso yielded a subpar result, so now let us experiment and examine how the RandomForest regressor compares.
+```{python}
+# Create a Random Forest Regressor
+rf_model = RandomForestRegressor(n_estimators=100, random_state=4)
+```
+
+```{python}
+# Fit the model to the training data
+rf_model.fit(X_train, y_train)
+```
+
+```{python}
+# Make predictions on the test set
+y_pred = rf_model.predict(X_test)
+y_pred
+```
+After making predictions using the test data, we want to verify the accuracy by computing the mean squared error and r-squared value.
+```{python}
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+```
+
+```{python}
+print("Mean Squared Error:", mse)
+print("R-squared:", r2)
+```
+
+```{python}
+# Plot our data and line smoothly
+plt.scatter(X_test, y_test, color='b', label='Actual')
+X_test_sorted = np.sort(X_test, axis=0)
+y_pred_sorted = rf_model.predict(X_test_sorted)
+plt.plot(X_test_sorted, y_pred_sorted, color='r', label='Predicted')
+
+plt.xlabel('Age')
+plt.ylabel('Tumor Size')
+plt.title('Random Forest Regression: Age vs. Tumor Size')
+plt.legend()
+plt.show()
+```
+Based on our results from the code output and graph above, it can be seen that with an r-squared value of about -0.22, we have a slightly better fit compared to the Lasso regression approach. However, this model is still a poor fit in the larger scope. The data itself appears to be fairly scattered and does not immediately appear to be linear or have any sort of clear pattern/relationship. Both models appear to be in the negative direction. We have a negative and weak relationship between the age and tumor size of the patient. Despite a slight improvement from the Lasso model, both models are ultimately a poor fit for the data. 

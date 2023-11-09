@@ -1,0 +1,135 @@
+---
+title: "Probability Theory and Random Variables"
+author: "Rithvik Guntor"
+date: "2023-11-1"
+categories: 
+  - code
+  - analysis
+---
+Probability Theory and Random Variables are an important component of statistical analysis in various studies. Probability theory serves as a framework for quantifying the likelihood of various outcomes in many statistical problems. In particular, probability theory and random variables have proven invaluable in the domain of breast cancer research. They enable researchers to model and analyze complex data, and facilitate a deeper understanding of the disease's prevalence, risk factors, and treatment outcomes, ultimately contributing to more effective diagnosis and treatment strategies. It's application and connection in breast cancer research allows us to better understand uncertainty in breast cancer cases as well as many other real-world applications. The below code provides a closer look at probability theory and random variable study using a breast cancer dataset. 
+```{python}
+# Import necessary libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import norm, lognorm
+from sklearn.preprocessing import StandardScaler
+from sklearn.mixture import GaussianMixture
+```
+
+```{python}
+# Load your breast cancer dataset
+data = pd.read_csv('Breast_Cancer.csv')
+data.head()
+```
+We specifically want to examine the patient age and tumor size varibales for this study. 
+```{python}
+# Select the relevant features: Age and Tumor Size
+X = data[['Age', 'Tumor Size']]
+X
+```
+We standardize the data to mitigate the effect of outliers and simplify interpretability.
+```{python}
+# Step 1: Standardize the data
+scaler = StandardScaler()
+X_std = scaler.fit_transform(X)
+```
+
+```{python}
+# Compute mean/standard deviation for the standardized data
+for feature in ['Age', 'Tumor Size']:
+    mean = X_std[:, X.columns.get_loc(feature)].mean()
+    std = X_std[:, X.columns.get_loc(feature)].std()
+    print(f"{feature}: Mean = {mean}, Standard Deviation = {std}")
+```
+
+```{python}
+# Plot Histograms and Fit Gaussian Distributions
+plt.figure(figsize=(12, 5))
+for i, feature in enumerate(['Age', 'Tumor Size'], start=1):
+    plt.subplot(1, 2, i)
+    plt.hist(X_std[:, X.columns.get_loc(feature)], bins=20, density=True, alpha=0.6, color='b', label=feature)
+    x = np.linspace(X_std[:, X.columns.get_loc(feature)].min(), X_std[:, X.columns.get_loc(feature)].max(), 100)
+    
+    # Fit a Gaussian (Normal) distribution
+    mu, std = norm.fit(X_std[:, X.columns.get_loc(feature)])
+    p = norm.pdf(x, mu, std)
+    plt.plot(x, p, 'k', linewidth=2, label=f'Normal Fit:\n$\mu$={mu:.2f}, $\sigma$={std:.2f}')
+    
+    plt.xlabel(feature + ' (Standardized)')
+    plt.ylabel('Probability')
+    plt.legend()
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+# Calculate mean for Age and Tumor Size
+means = X.mean()
+means
+```
+
+```{python}
+# Calculate variance Age and Tumor Size
+variances = X.var()
+variances
+```
+
+```{python}
+# Calculate covariance matrix for Age and Tumor Size
+covariance_matrix = X.cov()
+covariance_matrix
+```
+The results above show that the age variable has a higher mean than the tumor size variable. However, it is interesting that the tumor size appears to have a significantly larger variance compared to the age. It can be seen from the visualizations above that we have fitted normal Gaussian distributions. The standardized tumor size histogram/curve appear to be slightly skewed to the right compared to the standardized age histogram/curve. Though the tumor size histogram is standardized, the shape of the curve may be a result of the significant variance in the tumor size variable.  
+
+**Gaussian Mixture Model**
+
+Another technique that is often applicable to probability theory and random variable studies is the Gaussian Mixture Model method. This method is used to represent complex variable distributions. It can also be used in anomaly/outlier detection as well (see the anomaly/outlier detection post). GMMs are used to estimate the probability density of a continuous random variable. They represent the probability distribution as a weighted sum of multiple Gaussian distributions. The GMM can provide a more flexible representation of complex data distributions as opposed to a single Gaussian distribution. The code below explores the variables from the same dataset using the GMM technique.
+```{python}
+# Use the Gaussian Mixture Model Approach
+gm = GaussianMixture(n_components=3, n_init=10, random_state=42)
+gm.fit(X)
+```
+
+```{python}
+# Computes the weights
+gm.weights_
+```
+
+```{python}
+# Computes the means
+gm.means_
+```
+
+```{python}
+# Computes the covariances
+gm.covariances_
+```
+
+```{python}
+# Checks if algorithm converged
+gm.converged_
+```
+
+```{python}
+# Checks the number of iterations algorithm took to converge
+gm.n_iter_
+```
+
+```{python}
+# Predicts which cluster each instance belongs to
+gm.predict(X)
+```
+
+```{python}
+# Predicts probabilities that instance came from cluster
+gm.predict_proba(X).round(3)
+```
+
+```{python}
+# Estimate the log of the PDF at any location 
+gm.score_samples(X).round(2)
+```
+
+The code above uses the Gaussian Mixed Model method to estimate the logarithm of the probability density function of the data points in the variable 'X'. The GMM approach is a powerful tool in probability theory and random variable studies. It's applications in real-world situations like breast cancer studies make it invaluable throughout the industry and research. GMM enables us to model various data distributions to gain a better understanding of probability distribution functions, anomaly detection, and random variables as a whole. This versatile tool continues to allow statisticians and researchers to capture various components of complex data distributions.

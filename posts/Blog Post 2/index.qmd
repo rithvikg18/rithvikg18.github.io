@@ -1,0 +1,106 @@
+---
+title: "Clustering"
+author: "Rithvik Guntor"
+date: "2023-11-1"
+categories: 
+  - code
+  - analysis
+jupyter:
+  jupytext:
+    formats: 'ipynb,qmd'
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.15.2
+  kernelspec: 
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+**K-Means Clustering**
+
+Clustering is a fundamental technique in data analysis and machine learning that involves grouping similar data points together. These techniques are often used in breast cancer studies and analysis to identify groups and subgroups based on various characteristics among breast cancer patients. Visualizing this information in clusters can assist health experts in identifying potential groups of patients at risk of breast cancer. One particular clustering algorithm is K-means. This clustering algorithm helps to identify similar characteristics among various data points by selecting a K-value to represent how many clusters you wish to utilize in a study. The code below shows how K-means works using a breast cancer dataset.
+
+**Code & Visuals**
+
+```{python}
+# Import our necessary libraries/modules
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+```
+
+```{python}
+# Read in the dataset using Pandas
+data = pd.read_csv('breast-cancer.csv')
+data.head()
+```
+
+```{python}
+# Extract the features that we are interested in for the model/analysis
+selected_features = [
+    'radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean',
+    'smoothness_mean', 'compactness_mean', 'concavity_mean', 'concave points_mean',
+    'symmetry_mean', 'fractal_dimension_mean'
+]
+X = data[selected_features]
+X.head()
+```
+
+We standardize the data so that there isn't a particular feature that exhibits more influence over the others.
+
+```{python}
+# Standardize the features of interest to have mean = 0 and sd = 1
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_scaled
+```
+
+```{python}
+# Perform k-Means clustering using k = 3 clusters on the data
+k = 3
+kmeans = KMeans(n_clusters=k, random_state=0)
+kmeans.fit(X_scaled)
+```
+
+```{python}
+# Visualize the labels
+data['Cluster'] = kmeans.labels_
+data['Cluster'].head()
+```
+
+We can scale the data using PCA to simplify complex data with many features as well as for visualization purposes.
+
+```{python}
+# Use PCA to scale the data down to 2 dimensions on the standardized data
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+```
+
+```{python}
+# Plot the clusters from our k-Means clustering algorithm
+plt.figure(figsize=(8, 6))
+for cluster in range(k):
+    plt.scatter(X_pca[data['Cluster'] == cluster, 0], X_pca[data['Cluster'] == cluster, 1], label=f'Cluster {cluster + 1}')
+
+plt.title('K-means Clustering (PCA)')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.legend()
+plt.show()
+```
+
+As it can be seen in the code and the visualization, we are utilizing K = 3 clusters and 2 PCA components for this study. We can see that there are 3 distinct groups in the cluster shown, with each data point in each cluster sharing similar characteristics with each other. The data in our study was first standardized so that no single feature dominates the analysis; equal importance is given to all features in the data. Next, Principle-Component-Analysis (PCA) is performed on the standardized data points to scale the data down to 2 dimensions.
+
+This technique is often used so that complex data with many features can be simplified for understanding, visualization, and for interpretation of the data. In this study, PCA was performed to visualize our data clusters using 2 dimensions, which are our axes.The K-means algorithm was ultimately able to place various data points into groups based on their characteristics in a clean and organized manner, as per the visualization.
+
+**The DBSCAN Clustering Algorithm Comparison**
+
+K-Means is a powerful algorithm for grouping data. The algorithm however has various limitations. It is sensitive to noisy data as it assigns each point to the nearest centroid; outliers can significantly influence the centroids' positions. There are several other clustering algorithms that function similarly as well. Another particular clustering algorithm is Density-Based Spatial Clustering of Applications with Noise (DBSCAN). DBSCAN groups data points based on their density. It forms clusters around areas with high data density while marking outliers as noise. It's effective for discovering clusters of erratic/unpredictable shapes.
+
+DBSCAN is different from K-Means because it doesn't need you to guess how many groups there are in the data. Instead, it figures out the groups based on where the data points are huddled together. DBSCAN can find groups of various shapes and sizes, and it's not too bothered by some noisy or scattered data points. K-Means clustering, on the other hand, needs you to tell it how many groups you think there are in advance and assumes the groups are all about the same size and shape. DBSCAN is often more accurate than K-Means when dealing with real-world data because it can handle different shapes of groups and noisy data more effectively.

@@ -1,0 +1,180 @@
+---
+title: "Anomaly/Outlier Detection"
+author: "Rithvik Guntor"
+date: "2023-11-1"
+categories: 
+  - code
+  - analysis
+jupyter:
+  jupytext:
+    formats: 'ipynb,qmd'
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.15.2
+  kernelspec: 
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+**Isolation Forest**
+
+Anomaly and outlier detection is a statistical technique used to identify data points that deviate significantly from the rest of a given dataset. Outliers can provide useful insights like potential errors and unique patterns. One particular anomaly detection method is the Isolation Forest method. Isolation Forest is a powerful anomaly detection method that operates by isolating outliers in a dataset. Unlike traditional methods, it utilizes a randomized and hierarchical approach, making it especially effective in identifying anomalies. 
+
+In the context of breast cancer detection, Isolation Forest can be applied to identify unusual or suspicious patterns within medical imaging data or specific characteristics related to tumors themselves. The code below performs a study that attempts to identify tumor radius and texture means outliers using the Isolation Forest method for a breast cancer dataset.
+```{python}
+# Import necessary libraries
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+from sklearn.mixture import GaussianMixture
+from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
+import numpy as np
+```
+
+```{python}
+# Load the dataset
+data = pd.read_csv('data.csv')
+data.head()
+```
+
+```{python}
+# Encode the 'diagnosis' column from categorical (Malignant or Benign) to numeric (1 or 0)
+label_encoder = LabelEncoder()
+data['diagnosis'] = label_encoder.fit_transform(data['diagnosis'])
+```
+
+```{python}
+# Define the feature columns (exclude the 'diagnosis' column)
+feature_columns = ['radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean', 'compactness_mean', 'concavity_mean']
+```
+
+```{python}
+# Create a DataFrame with only the feature columns
+X = data[feature_columns]
+```
+
+```{python}
+# Initialize the Isolation Forest model
+isolation_forest = IsolationForest(contamination=0.05)
+```
+
+```{python}
+# Fit the model on the data
+isolation_forest.fit(X)
+```
+
+```{python}
+# Predict outliers using the trained model
+outliers = isolation_forest.predict(X)
+outliers
+```
+
+```{python}
+# Create a new column in the original DataFrame to label the outliers
+data['is_outlier'] = outliers
+```
+
+```{python}
+# Filter the data to get the outliers, -1 indicates an outlier
+outlier_data = data[data['is_outlier'] == -1]
+```
+
+```{python}
+# Visualize the data and outliers
+plt.figure(figsize=(12, 8))
+```
+
+```{python}
+# Scatter plot of feature columns
+plt.scatter(data['radius_mean'], data['texture_mean'], label='Data Points', c='b', alpha=0.5)
+```
+After fitting the Isolation Forest model and identifying outliers, we create a scatter plot of the feature columns, marking the data points in blue and the outliers in red with an 'x' marker. The scatter plot helps visualize the outliers in the context of the feature space, making it easier to understand their distribution.
+```{python}
+# Mark the outliers in red
+plt.scatter(outlier_data['radius_mean'], outlier_data['texture_mean'], label='Outliers', c='r', marker='x', s=100)
+
+plt.xlabel('Radius Mean')
+plt.ylabel('Texture Mean')
+plt.title('Isolation Forest Outlier Detection')
+plt.legend()
+plt.show()
+```
+After plotting the data, we can take a closer look at the list of outliers. 
+```{python}
+# Print the outliers
+print("Outliers:")
+print(outlier_data)
+```
+The above code displays the outliers in the plot as well as the individual outlier data points outputted as a list. In the study, we looked at the radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean', 'compactness_mean', and 'concavity_mean' features. The Isolation Forest method used this subset of features in our data to identify outliers in the context of the texture_mean and radius_mean variables, as seen in the graph. 
+
+By efficiently isolating and identifying outliers within our dataset, this method has enabled us to extract valuable insights and uncover unusual patterns that may have otherwise remained hidden from us. The Isolation Forest's capability to handle high-dimensional data, scalability, and ease of implementation make it a valuable asset in outlier and anomaly detection.
+
+**Gaussian Mixture Method**
+
+Along with the Isolation Forest method, there is another anomaly/outlier detection method known as the Gaussian Mixture model. We use the Gaussian Mixture Model (GMM) to fit the data and calculate Mahalanobis distances for each data point. Then, a threshold for anomaly detection is set based on the Mahalanobis distances. The threshold can be adjusted as needed. Data points are then labeled as an outlier or not depending on the comparison of their value to the threshold. The code below uses GMM to identify outliers based on Mahalanobis distances, which can be a powerful approach for anomaly detection. Adjust the number of components and threshold according to your specific dataset and requirements.
+```{python}
+# Performs outlier/anomaly detection using Gaussian Mixture Model
+# Initialize the Gaussian Mixture Model with a specified number of components (clusters) - We use 2 components to separate Malignant and Benign classes
+n_components = 2  
+gmm = GaussianMixture(n_components=n_components)
+```
+
+```{python}
+# Fit the model on the data
+gmm.fit(X)
+```
+
+```{python}
+# Calculate the Mahalanobis distances for each data point
+mahalanobis_distances = gmm.score_samples(X)
+```
+
+```{python}
+# Set a threshold for anomaly detection (you can adjust this threshold)
+threshold = np.percentile(mahalanobis_distances, 5)
+```
+
+```{python}
+# Identify outliers based on the threshold
+outliers = mahalanobis_distances < threshold
+```
+We identify outliers based on the threshold and create a new column 'is_outlier' in the original DataFrame to label the outliers.
+```{python}
+# Create a new column in the original DataFrame to label the outliers
+data['is_outlier'] = outliers
+```
+
+```{python}
+# Filter the data to get the outliers
+outlier_data = data[data['is_outlier']]
+```
+
+```{python}
+# Visualize the data and outliers
+plt.figure(figsize=(12, 8))
+```
+
+```{python}
+# Scatter plot of feature columns
+plt.scatter(data['radius_mean'], data['texture_mean'], label='Data Points', c='b', alpha=0.5)
+```
+
+```{python}
+# Mark the outliers in red
+plt.scatter(outlier_data['radius_mean'], outlier_data['texture_mean'], label='Outliers', c='r', marker='x', s=100)
+
+plt.xlabel('Radius Mean')
+plt.ylabel('Texture Mean')
+plt.title('Gaussian Mixture Model Outlier Detection')
+plt.legend()
+plt.show()
+```
+
+```{python}
+# Print the outliers
+print("Outliers:")
+print(outlier_data)
+```
+The code above shows the outliers in the graph marked with an 'X'. It can be seen that there are various similarities between the results from this graph as well as that from the Isolation Forest approach. There are various differences as well in the outlier results, and this is most likely a result of the differences in the outlier calculation approaches. Despite the differences in both approaches, the visualizations appear to display fairly accurate representations of the outlier data in both cases. Both approaches are powerful outlier detection techniques, and the choice between these methods is dependent on the structure of the data being worked with. 

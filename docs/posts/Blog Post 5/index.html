@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Rithvik Guntor">
+<meta name="dcterms.date" content="2023-11-01">
+
+<title>Blog - Anomaly/Outlier Detection</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Anomaly/Outlier Detection</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">code</div>
+                <div class="quarto-category">analysis</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Rithvik Guntor </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 1, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p><strong>Isolation Forest</strong></p>
+<p>Anomaly and outlier detection is a statistical technique used to identify data points that deviate significantly from the rest of a given dataset. Outliers can provide useful insights like potential errors and unique patterns. One particular anomaly detection method is the Isolation Forest method. Isolation Forest is a powerful anomaly detection method that operates by isolating outliers in a dataset. Unlike traditional methods, it utilizes a randomized and hierarchical approach, making it especially effective in identifying anomalies.</p>
+<p>In the context of breast cancer detection, Isolation Forest can be applied to identify unusual or suspicious patterns within medical imaging data or specific characteristics related to tumors themselves. The code below performs a study that attempts to identify tumor radius and texture means outliers using the Isolation Forest method for a breast cancer dataset.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import necessary libraries</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> IsolationForest</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.mixture <span class="im">import</span> GaussianMixture</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the dataset</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_csv(<span class="st">'data.csv'</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">diagnosis</th>
+<th data-quarto-table-cell-role="th">radius_mean</th>
+<th data-quarto-table-cell-role="th">texture_mean</th>
+<th data-quarto-table-cell-role="th">perimeter_mean</th>
+<th data-quarto-table-cell-role="th">area_mean</th>
+<th data-quarto-table-cell-role="th">smoothness_mean</th>
+<th data-quarto-table-cell-role="th">compactness_mean</th>
+<th data-quarto-table-cell-role="th">concavity_mean</th>
+<th data-quarto-table-cell-role="th">concave_points_mean</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">radius_worst</th>
+<th data-quarto-table-cell-role="th">texture_worst</th>
+<th data-quarto-table-cell-role="th">perimeter_worst</th>
+<th data-quarto-table-cell-role="th">area_worst</th>
+<th data-quarto-table-cell-role="th">smoothness_worst</th>
+<th data-quarto-table-cell-role="th">compactness_worst</th>
+<th data-quarto-table-cell-role="th">concavity_worst</th>
+<th data-quarto-table-cell-role="th">concave_points_worst</th>
+<th data-quarto-table-cell-role="th">symmetry_worst</th>
+<th data-quarto-table-cell-role="th">fractal_dimension_worst</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>842302</td>
+<td>M</td>
+<td>17.99</td>
+<td>10.38</td>
+<td>122.80</td>
+<td>1001.0</td>
+<td>0.11840</td>
+<td>0.27760</td>
+<td>0.3001</td>
+<td>0.14710</td>
+<td>...</td>
+<td>25.38</td>
+<td>17.33</td>
+<td>184.60</td>
+<td>2019.0</td>
+<td>0.1622</td>
+<td>0.6656</td>
+<td>0.7119</td>
+<td>0.2654</td>
+<td>0.4601</td>
+<td>0.11890</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>842517</td>
+<td>M</td>
+<td>20.57</td>
+<td>17.77</td>
+<td>132.90</td>
+<td>1326.0</td>
+<td>0.08474</td>
+<td>0.07864</td>
+<td>0.0869</td>
+<td>0.07017</td>
+<td>...</td>
+<td>24.99</td>
+<td>23.41</td>
+<td>158.80</td>
+<td>1956.0</td>
+<td>0.1238</td>
+<td>0.1866</td>
+<td>0.2416</td>
+<td>0.1860</td>
+<td>0.2750</td>
+<td>0.08902</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>84300903</td>
+<td>M</td>
+<td>19.69</td>
+<td>21.25</td>
+<td>130.00</td>
+<td>1203.0</td>
+<td>0.10960</td>
+<td>0.15990</td>
+<td>0.1974</td>
+<td>0.12790</td>
+<td>...</td>
+<td>23.57</td>
+<td>25.53</td>
+<td>152.50</td>
+<td>1709.0</td>
+<td>0.1444</td>
+<td>0.4245</td>
+<td>0.4504</td>
+<td>0.2430</td>
+<td>0.3613</td>
+<td>0.08758</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>84348301</td>
+<td>M</td>
+<td>11.42</td>
+<td>20.38</td>
+<td>77.58</td>
+<td>386.1</td>
+<td>0.14250</td>
+<td>0.28390</td>
+<td>0.2414</td>
+<td>0.10520</td>
+<td>...</td>
+<td>14.91</td>
+<td>26.50</td>
+<td>98.87</td>
+<td>567.7</td>
+<td>0.2098</td>
+<td>0.8663</td>
+<td>0.6869</td>
+<td>0.2575</td>
+<td>0.6638</td>
+<td>0.17300</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>84358402</td>
+<td>M</td>
+<td>20.29</td>
+<td>14.34</td>
+<td>135.10</td>
+<td>1297.0</td>
+<td>0.10030</td>
+<td>0.13280</td>
+<td>0.1980</td>
+<td>0.10430</td>
+<td>...</td>
+<td>22.54</td>
+<td>16.67</td>
+<td>152.20</td>
+<td>1575.0</td>
+<td>0.1374</td>
+<td>0.2050</td>
+<td>0.4000</td>
+<td>0.1625</td>
+<td>0.2364</td>
+<td>0.07678</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 32 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Encode the 'diagnosis' column from categorical (Malignant or Benign) to numeric (1 or 0)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>label_encoder <span class="op">=</span> LabelEncoder()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'diagnosis'</span>] <span class="op">=</span> label_encoder.fit_transform(data[<span class="st">'diagnosis'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the feature columns (exclude the 'diagnosis' column)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>feature_columns <span class="op">=</span> [<span class="st">'radius_mean'</span>, <span class="st">'texture_mean'</span>, <span class="st">'perimeter_mean'</span>, <span class="st">'area_mean'</span>, <span class="st">'smoothness_mean'</span>, <span class="st">'compactness_mean'</span>, <span class="st">'concavity_mean'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a DataFrame with only the feature columns</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> data[feature_columns]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize the Isolation Forest model</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>isolation_forest <span class="op">=</span> IsolationForest(contamination<span class="op">=</span><span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model on the data</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>isolation_forest.fit(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/rithvikguntor/opt/anaconda3/lib/python3.9/site-packages/sklearn/base.py:450: UserWarning:
+
+X does not have valid feature names, but IsolationForest was fitted with feature names
+</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>IsolationForest(contamination=0.05)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict outliers using the trained model</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>outliers <span class="op">=</span> isolation_forest.predict(X)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>outliers</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>array([-1,  1,  1, -1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,  1,  1,  1, -1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,
+        1,  1,  1,  1,  1,  1, -1,  1,  1,  1, -1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1, -1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1, -1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1, -1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1, -1, -1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1, -1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1, -1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1, -1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1, -1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1, -1,  1,  1,  1, -1, -1])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new column in the original DataFrame to label the outliers</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'is_outlier'</span>] <span class="op">=</span> outliers</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter the data to get the outliers, -1 indicates an outlier</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>outlier_data <span class="op">=</span> data[data[<span class="st">'is_outlier'</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize the data and outliers</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>&lt;Figure size 1152x768 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 1152x768 with 0 Axes&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatter plot of feature columns</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(data[<span class="st">'radius_mean'</span>], data[<span class="st">'texture_mean'</span>], label<span class="op">=</span><span class="st">'Data Points'</span>, c<span class="op">=</span><span class="st">'b'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7fdf2001cd30&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-13-output-2.png" width="566" height="411"></p>
+</div>
+</div>
+<p>After fitting the Isolation Forest model and identifying outliers, we create a scatter plot of the feature columns, marking the data points in blue and the outliers in red with an ‘x’ marker. The scatter plot helps visualize the outliers in the context of the feature space, making it easier to understand their distribution.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mark the outliers in red</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(outlier_data[<span class="st">'radius_mean'</span>], outlier_data[<span class="st">'texture_mean'</span>], label<span class="op">=</span><span class="st">'Outliers'</span>, c<span class="op">=</span><span class="st">'r'</span>, marker<span class="op">=</span><span class="st">'x'</span>, s<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Radius Mean'</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Texture Mean'</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Isolation Forest Outlier Detection'</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-14-output-1.png" width="597" height="449"></p>
+</div>
+</div>
+<p>After plotting the data, we can take a closer look at the list of outliers.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the outliers</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Outliers:"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(outlier_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Outliers:
+            id  diagnosis  radius_mean  texture_mean  perimeter_mean  \
+0       842302          1       17.990         10.38          122.80   
+3     84348301          1       11.420         20.38           77.58   
+78     8610862          1       20.180         23.97          143.70   
+82     8611555          1       25.220         24.91          171.50   
+101     862722          0        6.981         13.43           43.79   
+108      86355          1       22.270         19.67          152.80   
+112      86409          0       14.260         19.65           97.83   
+122     865423          1       24.250         20.20          166.20   
+152    8710441          0        9.731         15.34           63.78   
+164    8712289          1       23.270         22.04          152.10   
+180     873592          1       27.220         21.87          182.10   
+181     873593          1       21.090         26.57          142.70   
+202     878796          1       23.290         26.67          158.90   
+212    8810703          1       28.110         18.47          188.50   
+236   88299702          1       23.210         26.97          153.50   
+257     886776          1       15.320         17.27          103.20   
+258     887181          1       15.660         23.20          110.20   
+339      89812          1       23.510         24.27          155.10   
+352     899987          1       25.730         17.46          174.20   
+400   90439701          1       17.910         21.02          124.40   
+461  911296202          1       27.420         26.27          186.90   
+503     915143          1       23.090         19.83          152.10   
+504     915186          0        9.268         12.87           61.49   
+521   91762702          1       24.630         21.60          165.50   
+538     921092          0        7.729         25.49           47.98   
+539     921362          0        7.691         25.44           48.34   
+563     926125          1       20.920         25.09          143.00   
+567     927241          1       20.600         29.33          140.10   
+568      92751          0        7.760         24.54           47.92   
+
+     area_mean  smoothness_mean  compactness_mean  concavity_mean  \
+0       1001.0          0.11840           0.27760         0.30010   
+3        386.1          0.14250           0.28390         0.24140   
+78      1245.0          0.12860           0.34540         0.37540   
+82      1878.0          0.10630           0.26650         0.33390   
+101      143.5          0.11700           0.07568         0.00000   
+108     1509.0          0.13260           0.27680         0.42640   
+112      629.9          0.07837           0.22330         0.30030   
+122     1761.0          0.14470           0.28670         0.42680   
+152      300.2          0.10720           0.15990         0.41080   
+164     1686.0          0.08439           0.11450         0.13240   
+180     2250.0          0.10940           0.19140         0.28710   
+181     1311.0          0.11410           0.28320         0.24870   
+202     1685.0          0.11410           0.20840         0.35230   
+212     2499.0          0.11420           0.15160         0.32010   
+236     1670.0          0.09509           0.16820         0.19500   
+257      713.3          0.13350           0.22840         0.24480   
+258      773.5          0.11090           0.31140         0.31760   
+339     1747.0          0.10690           0.12830         0.23080   
+352     2010.0          0.11490           0.23630         0.33680   
+400      994.0          0.12300           0.25760         0.31890   
+461     2501.0          0.10840           0.19880         0.36350   
+503     1682.0          0.09342           0.12750         0.16760   
+504      248.7          0.16340           0.22390         0.09730   
+521     1841.0          0.10300           0.21060         0.23100   
+538      178.8          0.08098           0.04878         0.00000   
+539      170.4          0.08668           0.11990         0.09252   
+563     1347.0          0.10990           0.22360         0.31740   
+567     1265.0          0.11780           0.27700         0.35140   
+568      181.0          0.05263           0.04362         0.00000   
+
+     concave_points_mean  ...  texture_worst  perimeter_worst  area_worst  \
+0                0.14710  ...          17.33           184.60      2019.0   
+3                0.10520  ...          26.50            98.87       567.7   
+78               0.16040  ...          31.72           170.30      1623.0   
+82               0.18450  ...          33.62           211.70      2562.0   
+101              0.00000  ...          19.54            50.41       185.2   
+108              0.18230  ...          28.01           206.80      2360.0   
+112              0.07798  ...          23.73           107.00       709.0   
+122              0.20120  ...          23.99           180.90      2073.0   
+152              0.07857  ...          19.49            71.04       380.5   
+164              0.09702  ...          28.22           184.20      2403.0   
+180              0.18780  ...          32.85           220.80      3216.0   
+181              0.14960  ...          33.48           176.50      2089.0   
+202              0.16200  ...          32.68           177.00      1986.0   
+212              0.15950  ...          18.47           188.50      2499.0   
+236              0.12370  ...          34.51           206.00      2944.0   
+257              0.12420  ...          22.66           119.80       928.8   
+258              0.13770  ...          31.64           143.70      1226.0   
+339              0.14100  ...          30.73           202.40      2906.0   
+352              0.19130  ...          23.58           229.30      3234.0   
+400              0.11980  ...          27.78           149.60      1304.0   
+461              0.16890  ...          31.37           251.20      4254.0   
+503              0.10030  ...          23.87           211.50      2782.0   
+504              0.05252  ...          16.38            69.05       300.2   
+521              0.14710  ...          26.93           205.70      2642.0   
+538              0.00000  ...          30.92            57.17       248.0   
+539              0.01364  ...          31.89            54.49       223.6   
+563              0.14740  ...          29.41           179.10      1819.0   
+567              0.15200  ...          39.42           184.60      1821.0   
+568              0.00000  ...          30.37            59.16       268.6   
+
+     smoothness_worst  compactness_worst  concavity_worst  \
+0             0.16220            0.66560           0.7119   
+3             0.20980            0.86630           0.6869   
+78            0.16390            0.61640           0.7681   
+82            0.15730            0.60760           0.6476   
+101           0.15840            0.12020           0.0000   
+108           0.17010            0.69970           0.9608   
+112           0.08949            0.41930           0.6783   
+122           0.16960            0.42440           0.5803   
+152           0.12920            0.27720           0.8216   
+164           0.12280            0.35830           0.3948   
+180           0.14720            0.40340           0.5340   
+181           0.14910            0.75840           0.6780   
+202           0.15360            0.41670           0.7892   
+212           0.11420            0.15160           0.3201   
+236           0.14810            0.41260           0.5820   
+257           0.17650            0.45030           0.4429   
+258           0.15040            0.51720           0.6181   
+339           0.15150            0.26780           0.4819   
+352           0.15300            0.59370           0.6451   
+400           0.18730            0.59170           0.9034   
+461           0.13570            0.42560           0.6833   
+503           0.11990            0.36250           0.3794   
+504           0.19020            0.34410           0.2099   
+521           0.13420            0.41880           0.4658   
+538           0.12560            0.08340           0.0000   
+539           0.15960            0.30640           0.3393   
+563           0.14070            0.41860           0.6599   
+567           0.16500            0.86810           0.9387   
+568           0.08996            0.06444           0.0000   
+
+     concave_points_worst  symmetry_worst  fractal_dimension_worst  is_outlier  
+0                  0.2654          0.4601                  0.11890          -1  
+3                  0.2575          0.6638                  0.17300          -1  
+78                 0.2508          0.5440                  0.09964          -1  
+82                 0.2867          0.2355                  0.10510          -1  
+101                0.0000          0.2932                  0.09382          -1  
+108                0.2910          0.4055                  0.09789          -1  
+112                0.1505          0.2398                  0.10820          -1  
+122                0.2248          0.3222                  0.08009          -1  
+152                0.1571          0.3108                  0.12590          -1  
+164                0.2346          0.3589                  0.09187          -1  
+180                0.2688          0.2856                  0.08082          -1  
+181                0.2903          0.4098                  0.12840          -1  
+202                0.2733          0.3198                  0.08762          -1  
+212                0.1595          0.1648                  0.05525          -1  
+236                0.2593          0.3103                  0.08677          -1  
+257                0.2229          0.3258                  0.11910          -1  
+258                0.2462          0.3277                  0.10190          -1  
+339                0.2089          0.2593                  0.07738          -1  
+352                0.2756          0.3690                  0.08815          -1  
+400                0.1964          0.3245                  0.11980          -1  
+461                0.2625          0.2641                  0.07427          -1  
+503                0.2264          0.2908                  0.07277          -1  
+504                0.1025          0.3038                  0.12520          -1  
+521                0.2475          0.3157                  0.09671          -1  
+538                0.0000          0.3058                  0.09938          -1  
+539                0.0500          0.2790                  0.10660          -1  
+563                0.2542          0.2929                  0.09873          -1  
+567                0.2650          0.4087                  0.12400          -1  
+568                0.0000          0.2871                  0.07039          -1  
+
+[29 rows x 33 columns]</code></pre>
+</div>
+</div>
+<p>The above code displays the outliers in the plot as well as the individual outlier data points outputted as a list. In the study, we looked at the radius_mean’, ‘texture_mean’, ‘perimeter_mean’, ‘area_mean’, ‘smoothness_mean’, ‘compactness_mean’, and ‘concavity_mean’ features. The Isolation Forest method used this subset of features in our data to identify outliers in the context of the texture_mean and radius_mean variables, as seen in the graph.</p>
+<p>By efficiently isolating and identifying outliers within our dataset, this method has enabled us to extract valuable insights and uncover unusual patterns that may have otherwise remained hidden from us. The Isolation Forest’s capability to handle high-dimensional data, scalability, and ease of implementation make it a valuable asset in outlier and anomaly detection.</p>
+<p><strong>Gaussian Mixture Method</strong></p>
+<p>Along with the Isolation Forest method, there is another anomaly/outlier detection method known as the Gaussian Mixture model. We use the Gaussian Mixture Model (GMM) to fit the data and calculate Mahalanobis distances for each data point. Then, a threshold for anomaly detection is set based on the Mahalanobis distances. The threshold can be adjusted as needed. Data points are then labeled as an outlier or not depending on the comparison of their value to the threshold. The code below uses GMM to identify outliers based on Mahalanobis distances, which can be a powerful approach for anomaly detection. Adjust the number of components and threshold according to your specific dataset and requirements.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Performs outlier/anomaly detection using Gaussian Mixture Model</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize the Gaussian Mixture Model with a specified number of components (clusters) - We use 2 components to separate Malignant and Benign classes</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>n_components <span class="op">=</span> <span class="dv">2</span>  </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>gmm <span class="op">=</span> GaussianMixture(n_components<span class="op">=</span>n_components)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model on the data</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>gmm.fit(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>GaussianMixture(n_components=2)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the Mahalanobis distances for each data point</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>mahalanobis_distances <span class="op">=</span> gmm.score_samples(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a threshold for anomaly detection (you can adjust this threshold)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>threshold <span class="op">=</span> np.percentile(mahalanobis_distances, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify outliers based on the threshold</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>outliers <span class="op">=</span> mahalanobis_distances <span class="op">&lt;</span> threshold</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We identify outliers based on the threshold and create a new column ‘is_outlier’ in the original DataFrame to label the outliers.</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new column in the original DataFrame to label the outliers</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'is_outlier'</span>] <span class="op">=</span> outliers</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter the data to get the outliers</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>outlier_data <span class="op">=</span> data[data[<span class="st">'is_outlier'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize the data and outliers</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>&lt;Figure size 1152x768 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 1152x768 with 0 Axes&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatter plot of feature columns</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(data[<span class="st">'radius_mean'</span>], data[<span class="st">'texture_mean'</span>], label<span class="op">=</span><span class="st">'Data Points'</span>, c<span class="op">=</span><span class="st">'b'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7fdf195b7c40&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-24-output-2.png" width="566" height="411"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mark the outliers in red</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(outlier_data[<span class="st">'radius_mean'</span>], outlier_data[<span class="st">'texture_mean'</span>], label<span class="op">=</span><span class="st">'Outliers'</span>, c<span class="op">=</span><span class="st">'r'</span>, marker<span class="op">=</span><span class="st">'x'</span>, s<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Radius Mean'</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Texture Mean'</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Gaussian Mixture Model Outlier Detection'</span>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-25-output-1.png" width="585" height="449"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the outliers</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Outliers:"</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(outlier_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Outliers:
+            id  diagnosis  radius_mean  texture_mean  perimeter_mean  \
+0       842302          1       17.990         10.38          122.80   
+3     84348301          1       11.420         20.38           77.58   
+12      846226          1       19.170         24.80          132.40   
+68      859471          0        9.029         17.33           58.79   
+78     8610862          1       20.180         23.97          143.70   
+83     8611792          1       19.100         26.29          129.10   
+87    86135502          1       19.020         24.59          122.00   
+101     862722          0        6.981         13.43           43.79   
+108      86355          1       22.270         19.67          152.80   
+112      86409          0       14.260         19.65           97.83   
+122     865423          1       24.250         20.20          166.20   
+152    8710441          0        9.731         15.34           63.78   
+180     873592          1       27.220         21.87          182.10   
+181     873593          1       21.090         26.57          142.70   
+190     874858          1       14.220         23.12           94.37   
+202     878796          1       23.290         26.67          158.90   
+212    8810703          1       28.110         18.47          188.50   
+239   88330202          1       17.460         39.28          113.40   
+256   88649001          1       19.550         28.77          133.60   
+258     887181          1       15.660         23.20          110.20   
+318     894329          0        9.042         18.90           60.07   
+379    9013838          1       11.080         18.83           73.30   
+430     907914          1       14.900         22.53          102.10   
+461  911296202          1       27.420         26.27          186.90   
+504     915186          0        9.268         12.87           61.49   
+505     915276          0        9.676         13.14           64.12   
+538     921092          0        7.729         25.49           47.98   
+539     921362          0        7.691         25.44           48.34   
+568      92751          0        7.760         24.54           47.92   
+
+     area_mean  smoothness_mean  compactness_mean  concavity_mean  \
+0       1001.0          0.11840           0.27760         0.30010   
+3        386.1          0.14250           0.28390         0.24140   
+12      1123.0          0.09740           0.24580         0.20650   
+68       250.5          0.10660           0.14130         0.31300   
+78      1245.0          0.12860           0.34540         0.37540   
+83      1132.0          0.12150           0.17910         0.19370   
+87      1076.0          0.09029           0.12060         0.14680   
+101      143.5          0.11700           0.07568         0.00000   
+108     1509.0          0.13260           0.27680         0.42640   
+112      629.9          0.07837           0.22330         0.30030   
+122     1761.0          0.14470           0.28670         0.42680   
+152      300.2          0.10720           0.15990         0.41080   
+180     2250.0          0.10940           0.19140         0.28710   
+181     1311.0          0.11410           0.28320         0.24870   
+190      609.9          0.10750           0.24130         0.19810   
+202     1685.0          0.11410           0.20840         0.35230   
+212     2499.0          0.11420           0.15160         0.32010   
+239      920.6          0.09812           0.12980         0.14170   
+256     1207.0          0.09260           0.20630         0.17840   
+258      773.5          0.11090           0.31140         0.31760   
+318      244.5          0.09968           0.19720         0.19750   
+379      361.6          0.12160           0.21540         0.16890   
+430      685.0          0.09947           0.22250         0.27330   
+461     2501.0          0.10840           0.19880         0.36350   
+504      248.7          0.16340           0.22390         0.09730   
+505      272.5          0.12550           0.22040         0.11880   
+538      178.8          0.08098           0.04878         0.00000   
+539      170.4          0.08668           0.11990         0.09252   
+568      181.0          0.05263           0.04362         0.00000   
+
+     concave_points_mean  ...  texture_worst  perimeter_worst  area_worst  \
+0                0.14710  ...          17.33           184.60      2019.0   
+3                0.10520  ...          26.50            98.87       567.7   
+12               0.11180  ...          29.94           151.70      1332.0   
+68               0.04375  ...          22.65            65.50       324.7   
+78               0.16040  ...          31.72           170.30      1623.0   
+83               0.14690  ...          32.72           141.30      1298.0   
+87               0.08271  ...          30.41           152.90      1623.0   
+101              0.00000  ...          19.54            50.41       185.2   
+108              0.18230  ...          28.01           206.80      2360.0   
+112              0.07798  ...          23.73           107.00       709.0   
+122              0.20120  ...          23.99           180.90      2073.0   
+152              0.07857  ...          19.49            71.04       380.5   
+180              0.18780  ...          32.85           220.80      3216.0   
+181              0.14960  ...          33.48           176.50      2089.0   
+190              0.06618  ...          37.18           106.40       762.4   
+202              0.16200  ...          32.68           177.00      1986.0   
+212              0.15950  ...          18.47           188.50      2499.0   
+239              0.08811  ...          44.87           141.20      1408.0   
+256              0.11440  ...          36.27           178.60      1926.0   
+258              0.13770  ...          31.64           143.70      1226.0   
+318              0.04908  ...          23.40            68.62       297.1   
+379              0.06367  ...          32.82            91.76       508.1   
+430              0.09711  ...          27.57           125.40       832.7   
+461              0.16890  ...          31.37           251.20      4254.0   
+504              0.05252  ...          16.38            69.05       300.2   
+505              0.07038  ...          18.04            69.47       328.1   
+538              0.00000  ...          30.92            57.17       248.0   
+539              0.01364  ...          31.89            54.49       223.6   
+568              0.00000  ...          30.37            59.16       268.6   
+
+     smoothness_worst  compactness_worst  concavity_worst  \
+0             0.16220            0.66560           0.7119   
+3             0.20980            0.86630           0.6869   
+12            0.10370            0.39030           0.3639   
+68            0.14820            0.43650           1.2520   
+78            0.16390            0.61640           0.7681   
+83            0.13920            0.28170           0.2432   
+87            0.12490            0.32060           0.5755   
+101           0.15840            0.12020           0.0000   
+108           0.17010            0.69970           0.9608   
+112           0.08949            0.41930           0.6783   
+122           0.16960            0.42440           0.5803   
+152           0.12920            0.27720           0.8216   
+180           0.14720            0.40340           0.5340   
+181           0.14910            0.75840           0.6780   
+190           0.15330            0.93270           0.8488   
+202           0.15360            0.41670           0.7892   
+212           0.11420            0.15160           0.3201   
+239           0.13650            0.37350           0.3241   
+256           0.12810            0.53290           0.4251   
+258           0.15040            0.51720           0.6181   
+318           0.12210            0.37480           0.4609   
+379           0.21840            0.93790           0.8402   
+430           0.14190            0.70900           0.9019   
+461           0.13570            0.42560           0.6833   
+504           0.19020            0.34410           0.2099   
+505           0.20060            0.36630           0.2913   
+538           0.12560            0.08340           0.0000   
+539           0.15960            0.30640           0.3393   
+568           0.08996            0.06444           0.0000   
+
+     concave_points_worst  symmetry_worst  fractal_dimension_worst  is_outlier  
+0                  0.2654          0.4601                  0.11890        True  
+3                  0.2575          0.6638                  0.17300        True  
+12                 0.1767          0.3176                  0.10230        True  
+68                 0.1750          0.4228                  0.11750        True  
+78                 0.2508          0.5440                  0.09964        True  
+83                 0.1841          0.2311                  0.09203        True  
+87                 0.1956          0.3956                  0.09288        True  
+101                0.0000          0.2932                  0.09382        True  
+108                0.2910          0.4055                  0.09789        True  
+112                0.1505          0.2398                  0.10820        True  
+122                0.2248          0.3222                  0.08009        True  
+152                0.1571          0.3108                  0.12590        True  
+180                0.2688          0.2856                  0.08082        True  
+181                0.2903          0.4098                  0.12840        True  
+190                0.1772          0.5166                  0.14460        True  
+202                0.2733          0.3198                  0.08762        True  
+212                0.1595          0.1648                  0.05525        True  
+239                0.2066          0.2853                  0.08496        True  
+256                0.1941          0.2818                  0.10050        True  
+258                0.2462          0.3277                  0.10190        True  
+318                0.1145          0.3135                  0.10550        True  
+379                0.2524          0.4154                  0.14030        True  
+430                0.2475          0.2866                  0.11550        True  
+461                0.2625          0.2641                  0.07427        True  
+504                0.1025          0.3038                  0.12520        True  
+505                0.1075          0.2848                  0.13640        True  
+538                0.0000          0.3058                  0.09938        True  
+539                0.0500          0.2790                  0.10660        True  
+568                0.0000          0.2871                  0.07039        True  
+
+[29 rows x 33 columns]</code></pre>
+</div>
+</div>
+<p>The code above shows the outliers in the graph marked with an ‘X’. It can be seen that there are various similarities between the results from this graph as well as that from the Isolation Forest approach. There are various differences as well in the outlier results, and this is most likely a result of the differences in the outlier calculation approaches. Despite the differences in both approaches, the visualizations appear to display fairly accurate representations of the outlier data in both cases. Both approaches are powerful outlier detection techniques, and the choice between these methods is dependent on the structure of the data being worked with.</p>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
